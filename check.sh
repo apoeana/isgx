@@ -102,7 +102,7 @@ if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
 
     echo "Uninstall script executed successfully on the host."
 else
-    echo "Checking for SGX drivers..."
+    echo "Checking for SGX drivers on the host..."
     if ls /dev/ | grep -q "sgx_enclave"; then
         echo "/dev/sgx_enclave driver is present on the host."
     fi
