@@ -5,22 +5,22 @@ if test $(id -u) -ne 0; then
     exit 1
 fi
 
-echo "Checking Vagrant VM..."
+echo "Find the directory where Vagrant is located...."
 vagrant_dir=$(sudo vagrant global-status | grep running | awk '{print $5}')
 if [ -z "$vagrant_dir" ]; then
     echo "No running Vagrant environment found."
 else
-    echo "Running uninstall script on the Vagrant VM..."
+    echo "Checking Vagrant VM for sgx_enclave and isgx..."
 
     cd "$vagrant_dir"
-    if sudo vagrant ssh -c "
+    sudo vagrant ssh -c "
         # Start of uninstall script on the Vagrant VM
         if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
-            echo 'Both sgx_enclave and isgx are present on the Vagrant VM.'
+            echo 'Both sgx_enclave and isgx drivers are present on the Vagrant VM.'
             echo 'Running uninstall script on the Vagrant VM...'
 
             # Check if the AESM service is running
-            if sudo service aesmd status | grep 'Active: active (running)'; then
+            if sudo service aesmd status 2>/dev/null | grep 'Active: active (running)'; then
                 echo -e 'Uninstall failed on the Vagrant VM!'
                 echo -e '\nPlease stop the AESM service and uninstall the PSW package first on the Vagrant VM'
                 exit 1
@@ -53,28 +53,27 @@ else
 
             echo 'Uninstall script executed successfully on the Vagrant VM.'
         else
-            echo 'Both sgx_enclave and isgx are not present on the Vagrant VM.'
-            echo 'Nothing to uninstall on the Vagrant VM.'
+            echo 'Checking for SGX drivers on the Vagrant VM...'
+            if ls /dev/ | grep -q 'sgx_enclave'; then
+                echo '/dev/sgx_enclave driver is present on the Vagrant VM.'
+            fi
+            if ls /dev/ | grep -q 'isgx'; then
+                echo '/dev/isgx driver is present on the Vagrant VM.'
+            fi
         fi
-    "; then
-        echo "Uninstall script executed successfully on the Vagrant VM."
-    else
-        echo "Uninstall script execution failed on the Vagrant VM."
-    fi
-fi
+    "
 
 echo "Checking host for sgx_enclave and isgx..."
 if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
-    echo "Both sgx_enclave and isgx are present on the host."
+    echo "Both sgx_enclave and isgx drivers are present on the host."
     echo "Running uninstall script on the host..."
 
-    # Do not uninstall if the AESM service exists
-    sudo service aesmd reload &> /dev/null
-    if [[ $? == "0" ]]; then
-        echo -e "Uninstall failed on the host!"
-        echo -e "\nPlease uninstall the PSW package first"
-        exit 1
-    fi
+   # Check if the AESM service is running
+   if sudo service aesmd status 2>/dev/null | grep 'Active: active (running)'; then
+           echo -e 'Uninstall failed on the host!'
+           echo -e '\nPlease stop the AESM service and uninstall the PSW package first on the host'
+           exit 1
+   fi
 
     # Removing the kernel module if it is inserted
     sudo modinfo isgx &> /dev/null
@@ -103,6 +102,14 @@ if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
 
     echo "Uninstall script executed successfully on the host."
 else
-    echo "Both sgx_enclave and isgx are not present on the host."
-    echo "Nothing to uninstall on the host."
+    echo "Checking for SGX drivers..."
+    if ls /dev/ | grep -q "sgx_enclave"; then
+        echo "/dev/sgx_enclave driver is present on the host."
+    fi
+    if ls /dev/ | grep -q "isgx"; then
+        echo "/dev/isgx driver is present on the host."
+    fi
 fi
+fi
+
+echo "Operation completed successfully!"
