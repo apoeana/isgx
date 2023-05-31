@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x  # Enable debug mode
-
 if test $(id -u) -ne 0; then
     echo "Root privilege is required."
     exit 1
