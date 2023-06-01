@@ -6,4 +6,4 @@ To execute the script:
 2.  Navigate to the directory by running the command: 
     - $ cd isgx/
 4.  Run the script with root privileges using the command:
-    - $ sudo /bin/bash check.sh
+    - $ sudo /bin/bash isgx_removal_tool.sh
