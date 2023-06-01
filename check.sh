@@ -37,7 +37,10 @@ else
             fi
 
             # Removing the .ko file
-            sudo rm -f /lib/modules/5.15.0-71-generic/kernel/drivers/intel/sgx/isgx.ko
+            sudo find /usr/lib/modules/ -name "isgx.ko" -exec rm -f {} +
+            
+            # Add blacklist isgx
+            echo "blacklist isgx" | sudo tee -a /etc/modprobe.d/blacklist.conf
 
             # Removing from depmod
             sudo depmod
@@ -86,7 +89,10 @@ if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
     fi
 
     # Removing the .ko file
-    sudo rm -f /lib/modules/5.15.0-71-generic/kernel/drivers/intel/sgx/isgx.ko
+    sudo find /usr/lib/modules/ -name "isgx.ko" -exec rm -f {} +
+    
+    # Add blacklist isgx
+    echo "blacklist isgx" | sudo tee -a /etc/modprobe.d/blacklist.conf
 
     # Removing from depmod
     sudo depmod
