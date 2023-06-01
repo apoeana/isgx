@@ -3,5 +3,7 @@ The script checks the host machine and vagrant VM machine for the presence of sg
 To execute the script:
 
 1.  Clone the repository.
-2.  Navigate to the directory by running the command: cd isgx/
-3.  Run the script with root privileges using the command: sudo /bin/bash check.sh
+2.  Navigate to the directory by running the command: 
+    - $ cd isgx/
+4.  Run the script with root privileges using the command:
+    - $ sudo /bin/bash check.sh
