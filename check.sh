@@ -38,9 +38,6 @@ else
 
             # Removing the .ko file
             sudo find /usr/lib/modules/ -name 'isgx.ko' -exec rm -f {} +
-            
-            # Add blacklist isgx
-            echo 'blacklist isgx' | sudo tee -a /etc/modprobe.d/blacklist.conf 2>/dev/null
 
             # Removing from depmod
             sudo depmod
@@ -91,9 +88,6 @@ if [ -c /dev/sgx_enclave ] && [ -c /dev/isgx ]; then
     # Removing the .ko file
     sudo find /usr/lib/modules/ -name "isgx.ko" -exec rm -f {} +
     
-    # Add blacklist isgx
-    echo "blacklist isgx" | sudo tee -a /etc/modprobe.d/blacklist.conf 2>/dev/null
-
     # Removing from depmod
     sudo depmod
 
